@@ -336,11 +336,11 @@ function inflate_block!(decoded_text, bs::BitStream)
     codes = read_second_tree_codes(bs, head, first_tree)
     
     literal_codes = codes[1:257 + head.hlit]
-    lit_code_table = create_code_table(literal_codes, [0:length(literal_codes)-1])
+    lit_code_table = create_code_table(literal_codes, collect(0:length(literal_codes)-1))
     literal_tree = create_huffman_tree(lit_code_table)
     
     distance_codes = codes[end-head.hdist:end]
-    dist_code_table = create_code_table(distance_codes, [0:length(distance_codes)-1])
+    dist_code_table = create_code_table(distance_codes, collect(0:length(distance_codes)-1))
     distance_tree = create_huffman_tree(dist_code_table)
     
     return inflate_block!(decoded_text, bs, literal_tree, distance_tree)
