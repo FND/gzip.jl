@@ -157,7 +157,7 @@ function create_code_table(hclens, labels)
 end
 
 function make_bit_vector(n::Any, len::Any)
-    vec = BitVector(int(len))
+    vec = BitVector(Int(len))
     for i=1:len
         vec[len - i + 1] = n & 1
         n >>= 1
