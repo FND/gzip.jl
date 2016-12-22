@@ -42,11 +42,11 @@ Base.read(bs::BitStream, ::Type{HuffmanHeader}) = HuffmanHeader(
 
 
 
-has_ext(flags::GzipFlags)     = bool(0x01 & flags)
-has_crc(flags::GzipFlags)     = bool(0x02 & flags)
-has_extra(flags::GzipFlags)   = bool(0x04 & flags)
-has_name(flags::GzipFlags)    = bool(0x08 & flags)
-has_comment(flags::GzipFlags) = bool(0x10 & flags)
+has_ext(flags::GzipFlags)     = (0x01 & flags) != 0
+has_crc(flags::GzipFlags)     = (0x02 & flags) != 0
+has_extra(flags::GzipFlags)   = (0x04 & flags) != 0
+has_name(flags::GzipFlags)    = (0x08 & flags) != 0
+has_comment(flags::GzipFlags) = (0x10 & flags) != 0
 
 function Base.read(bs::BitStream, ::Type{BlockFormat})
     bits = read_bits(bs, 3)
@@ -187,7 +187,7 @@ function Base.setindex!(node::InternalNode, value::Node, dir::Bool)
         node.one = value
     end
 end
-Base.getindex(node::InternalNode, dir::Integer) = bool(dir) ? node.one : node.zero
+Base.getindex(node::InternalNode, dir::Integer) = dir != 0 ? node.one : node.zero
 function Base.getindex(node::InternalNode, code)
     for (i, bit) = enumerate(code)
         node = node[bit]
