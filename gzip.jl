@@ -4,7 +4,7 @@ type BitStream
 end
 BitStream(io::IO) = BitStream(io, BitVector(0))
 
-typealias GzipFlags UInt8
+const GzipFlags = UInt8
 
 type GzipHeader
   id::Vector{UInt8} # length 2
@@ -139,7 +139,7 @@ function create_code_table(hclens, labels)
     labels = labels[nonzero_indices]
 
     sorted_pairs = sort([x for x=zip(hclens, labels)])
-    answer = Array(UInt16, length(hclens))
+    answer = Array{UInt16}(length(hclens))
     prev_code_len = 0
     for (i, (code_len, label)) = enumerate(sorted_pairs)
         if i == 1
@@ -166,7 +166,7 @@ function make_bit_vector(n::Any, len::Any)
 end
 #read_huffman_stream(file)
 
-abstract Node
+abstract type Node end
 
 type InternalNode <: Node
     one::Node
@@ -226,7 +226,7 @@ function read_first_tree(bs::BitStream, hclen)
     return first_tree
 end
 
-typealias HuffmanTree InternalNode
+const HuffmanTree = InternalNode
 
 function read_huffman_bits(bs::BitStream, tree::HuffmanTree)
     node = tree
@@ -239,7 +239,7 @@ end
 
 function read_second_tree_codes(bs::BitStream, head::HuffmanHeader, tree::HuffmanTree)
     n_to_read = head.hlit + head.hdist + 258
-    vals = Array(UInt8, n_to_read)
+    vals = Array{UInt8}(n_to_read)
     i = 1
     while i <= n_to_read
         code_len = read_huffman_bits(bs, tree)
