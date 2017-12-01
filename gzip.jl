@@ -18,9 +18,9 @@ end
 type GzipMetadata
   header::GzipHeader
   xlen::UInt16
-  extra::ASCIIString
-  fname::ASCIIString
-  fcomment::ASCIIString
+  extra::String
+  fname::String
+  fcomment::String
   crc16::UInt16
 end
 
@@ -56,10 +56,10 @@ end
 
 
 function Base.read(file::IO, ::Type{GzipHeader})
-    id = readbytes(file, 2)
+    id = read(file, 2)
     compression_method = read(file, UInt8)
     flags = read(file, GzipFlags)
-    mtime = readbytes(file, 4)
+    mtime = read(file, 4)
     extra_flags = read(file, UInt8)
     os = read(file, UInt8)
     @assert(id == [0x1f, 0x8b], "Gzip magic bytes not present")
@@ -70,20 +70,20 @@ end
 function Base.read(file::IO, ::Type{GzipMetadata})
     header = read(file, GzipHeader)
     xlen::UInt16 = 0
-    extra::ASCIIString = ""
-    fname::ASCIIString = ""
-    fcomment::ASCIIString = ""
+    extra::String = ""
+    fname::String = ""
+    fcomment::String = ""
     crc16::UInt16 = 0
     # TODO: There are only 4 checks here. WHY?!?? Is this a bug?
     if has_extra(header.flags)
         xlen = read(file, UInt16)
-        extra = ASCIIString(readbytes(file, xlen))
+        extra = String(read(file, xlen))
     end
     if has_name(header.flags)
-        fname = ASCIIString(readuntil(file, 0x00)[1:end-1])
+        fname = String(readuntil(file, 0x00)[1:end-1])
     end
     if has_comment(header.flags)
-        fname = ASCIIString(readuntil(file, 0x00)[1:end-1])
+        fname = String(readuntil(file, 0x00)[1:end-1])
     end
     if has_crc(header.flags)
         crc16 = read(file, UInt16)
@@ -380,4 +380,4 @@ function inflate_block!(decoded_text, bs::BitStream, literal_tree::HuffmanTree, 
     return decoded_text
 end
 
-display_ascii(arr) = ASCIIString(convert(Vector{UInt8}, arr))
+display_ascii(arr) = String(convert(Vector{UInt8}, arr))
